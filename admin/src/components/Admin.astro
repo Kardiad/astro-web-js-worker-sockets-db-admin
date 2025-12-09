@@ -1,0 +1,62 @@
+---
+import astroLogo from "../assets/astro.svg";
+import background from "../assets/background.svg";
+---
+
+<div class="flex">
+    <div>
+        <!-- Añadir aquí una sidofoto -->
+    </div>
+    <div>
+        <!-- Añadir aquí el texto o algo para que quede gonito -->
+    </div>
+</div>
+
+<div class="flex flex-col justify-center">
+    <!-- Start form to add things -->
+    <div class="flex flex-col w-[50%] m-auto" id="form">
+        <h2>Añadir discos</h2>
+        <label for="title">Titulo</label>
+        <input type="text" name="title" id="title" placeholder="Título" />
+        <label for="price">Precio</label>
+        <input type="number" name="price" id="price" placeholder="0.0" />
+        <label for="stock">Stock</label>
+        <input type="number" name="stock" id="stock" placeholder="0" />
+        <button id="addCD" class="mt-[1rem]">+</button>
+    </div>
+    <div id="renderTable"></div>
+</div>
+
+<script>
+    import { DataBase } from "../db/db";
+    import { io } from "socket.io-client";
+    const db = new DataBase();
+    const socket = io("http://localhost:3000");
+    socket.on("getdb", (data) => {
+        if (data.updatedatabase) {
+            db.read().then((result) => {
+                socket.emit("updatedatabase", result);
+            });
+        }
+    });
+    db.read().then((data)=>{
+        document.getElementById("renderTable")?.innerHTML += `
+        <div>
+        `; 
+    })
+    document.getElementById("addCD")?.addEventListener("click", () => {
+        const formImage = document.getElementById("form");
+        const formValues = {
+            title: formImage?.querySelector("#title")?.value,
+            price: parseFloat(formImage?.querySelector("#price")?.value),
+            stock: parseInt(formImage?.querySelector("#stock")?.value),
+        };
+        //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
+        db.writeAsync("cd", formValues, () => {
+            socket.emit("masterupdatedb", formValues);
+        });
+    });
+    socket.on("updatestock", (data) => {
+        db.update('cd', data)
+    });
+</script>
