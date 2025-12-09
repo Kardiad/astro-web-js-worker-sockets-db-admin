@@ -18,6 +18,8 @@ import background from "../assets/background.svg";
         <h2>Añadir discos</h2>
         <label for="title">Titulo</label>
         <input type="text" name="title" id="title" placeholder="Título" />
+        <label for="image">Imagen</label>
+        <input type="text" name="image" id="image" placeholder="Url" />
         <label for="price">Precio</label>
         <input type="number" name="price" id="price" placeholder="0.0" />
         <label for="stock">Stock</label>
@@ -40,9 +42,16 @@ import background from "../assets/background.svg";
         }
     });
     db.read().then((data)=>{
-        document.getElementById("renderTable")?.innerHTML += `
-        <div>
-        `; 
+        for(let item of data){
+            document.getElementById('renderTable')!.innerHTML += `
+                <div>
+                    <h2>${item.title}</h2>
+                    <p>Aquí irá una fotito</p>
+                    <p>${item.price}</p>
+                    <p>${item.stock}</p>
+                </div>
+            `
+        }
     })
     document.getElementById("addCD")?.addEventListener("click", () => {
         const formImage = document.getElementById("form");
@@ -50,11 +59,12 @@ import background from "../assets/background.svg";
             title: formImage?.querySelector("#title")?.value,
             price: parseFloat(formImage?.querySelector("#price")?.value),
             stock: parseInt(formImage?.querySelector("#stock")?.value),
+            image: formImage?.querySelector("#image")?.value
         };
         //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
-        db.writeAsync("cd", formValues, () => {
-            socket.emit("masterupdatedb", formValues);
-        });
+        //db.writeAsync("cd", formValues, () => {
+        //    socket.emit("masterupdatedb", formValues);
+        //});
     });
     socket.on("updatestock", (data) => {
         db.update('cd', data)
