@@ -2,7 +2,7 @@ export class DataBase {
 
     dbName = "cdProyect";
 
-    dbVersion = 1;
+    dbVersion = 2;
 
     dbConnection;
 
@@ -16,6 +16,18 @@ export class DataBase {
             this.statement = event.target.result;
             if (!this.statement.objectStoreNames?.contains("cd")) {
                 event.target.result.createObjectStore("cd", {
+                    keyPath: "id",
+                    autoIncrement: true
+                })
+            }
+            if (!this.statement.objectStoreNames?.contains("events")) {
+                event.target.result.createObjectStore("events", {
+                    keyPath: "id",
+                    autoIncrement: true
+                })
+            }
+            if (!this.statement.objectStoreNames?.contains("suggestions")) {
+                event.target.result.createObjectStore("suggestions", {
                     keyPath: "id",
                     autoIncrement: true
                 })
@@ -41,6 +53,18 @@ export class DataBase {
                             autoIncrement: true
                         })
                     }
+                    if (!this.statement.objectStoreNames?.contains("events")) {
+                        event.target.result.createObjectStore("events", {
+                            keyPath: "id",
+                            autoIncrement: true
+                        })
+                    }
+                    if (!this.statement.objectStoreNames?.contains("suggestions")) {
+                        event.target.result.createObjectStore("suggestions", {
+                            keyPath: "id",
+                            autoIncrement: true
+                        })
+                    }
                 }
                 dbConnection.onsuccess = (event) => {
                     resolve(event.target.result);
@@ -53,14 +77,14 @@ export class DataBase {
             })
     }
 
-    read = () => {
+    read = (table) => {
         return this.build()
             .then((resolve) => {
                 return new Promise(
                     (resolve, reject) => {
                         let result = [];
-                        const transaction = this.statement.transaction(["cd"], "readonly");
-                        const store = transaction.objectStore("cd");
+                        const transaction = this.statement.transaction([table], "readonly");
+                        const store = transaction.objectStore(table);
                         const request = store.getAll();
                         request.onsuccess = () => {
                             resolve(request.result)
@@ -109,12 +133,12 @@ export class DataBase {
             .then((db) => {
                 console.log(db.transaction)
                 return new Promise(() => {
-                    const transaction = db.transaction(['cd'], "readwrite");
-                    const store = transaction.objectStore("cd");
+                    const transaction = db.transaction([table], "readwrite");
+                    const store = transaction.objectStore(table);
                     const request = store.add(data);
-                    request.onsuccess = () => {          
-                        callback();              
-                        console.log(`inserción de ${table} se ha realizado correctamente`)                        
+                    request.onsuccess = () => {
+                        callback();
+                        console.log(`inserción de ${table} se ha realizado correctamente`)
                     }
                     request.onerror = (event) => {
                         console.log(`No funcionó correctamente`, event.target.error)
@@ -124,8 +148,8 @@ export class DataBase {
     }
 
     write = (table, data) => {
-        const transaction = this.statement.transaction(['cd'], "readwrite");
-        const store = transaction.objectStore("cd");
+        const transaction = this.statement.transaction([table], "readwrite");
+        const store = transaction.objectStore(table);
         const request = store.add(data);
         request.onsuccess = () => {
             console.log(`inserción de ${table} se ha realizado correctamente`)

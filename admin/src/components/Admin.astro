@@ -1,8 +1,3 @@
----
-import astroLogo from "../assets/astro.svg";
-import background from "../assets/background.svg";
----
-
 <div class="flex">
     <div>
         <!-- Añadir aquí una sidofoto -->
@@ -14,28 +9,53 @@ import background from "../assets/background.svg";
 
 <div class="flex flex-col justify-center">
     <!-- Start form to add things -->
-    <div class="flex flex-col w-[50%] m-auto" id="form">
-        <h2>Añadir discos</h2>
-        <label for="title">Titulo</label>
-        <input type="text" name="title" id="title" placeholder="Título" />
-        <label for="image">Imagen</label>
-        <input type="text" name="image" id="image" placeholder="Url" />
-        <label for="price">Precio</label>
-        <input type="number" name="price" id="price" placeholder="0.0" />
-        <label for="stock">Stock</label>
-        <input type="number" name="stock" id="stock" placeholder="0" />
-        <button id="addCD" class="mt-[1rem]">+</button>
+    <div class="flex justify-around">
+        <div class="flex flex-col w-[30%] m-auto" id="form">
+            <h2>Añadir discos</h2>
+            <label for="title">Titulo</label>
+            <input type="text" name="title" id="title" placeholder="Título" />
+            <label for="image">Imagen</label>
+            <input type="text" name="image" id="image" placeholder="Url" />
+            <label for="price">Precio</label>
+            <input type="number" name="price" id="price" placeholder="0.0" />
+            <label for="stock">Stock</label>
+            <input type="number" name="stock" id="stock" placeholder="0" />
+            <label for="desc">Description</label>
+            <textarea name="desc" id="desc" placeholder="Descripción"></textarea>
+            <button id="addCD" class="mt-[1rem]">+</button>
+        </div>
+        <div class="flex flex-col w-[30%] m-auto" id="form">
+            <h2>Añadir eventos</h2>
+            <label for="title">Titulo</label>
+            <input type="text" name="title" id="etitle" placeholder="Título" />
+            <label for="image">Imagen</label>
+            <input type="text" name="image" id="eimage" placeholder="Url" />
+            <label for="price">Precio</label>
+            <input type="number" name="price" id="eprice" placeholder="0.0" />
+            <label for="stock">Aforo</label>
+            <input type="number" name="stock" id="estock" placeholder="0" />
+            <label for="desc">Description</label>
+            <textarea name="desc" id="edesc" placeholder="Descripción"></textarea>
+            <button id="addEvent" class="mt-[1rem]">+</button>
+        </div>
     </div>
-    <div id="renderTable"></div>
+    <div class="flex">
+        <div id="renderCds" class="w-[50%]"></div>
+        <div id="renderEvents" class="w-[50%]"></div>
+    </div>
 </div>
 
 <script>
     import { Compresor } from "../db/compresor";
     import { DataBase } from "../db/db";
-    import { io } from "socket.io-client";    
+    import { io } from "socket.io-client";
     const db = new DataBase();
     const socket = io("http://localhost:3000");
     const compresor = new Compresor();
+    const worker = new Worker("/src/db/WorkerEmiterDB.js", {
+        type: "module",
+    });
+
     socket.on("getdb", (data) => {
         if (data.updatedatabase) {
             db.read().then((result) => {
@@ -44,20 +64,34 @@ import background from "../assets/background.svg";
         }
     });
     const readData = () => {
-        document.getElementById("renderTable")!.innerHTML = "";
-        db.read().then((data) => {
+        document.getElementById("renderCds")!.innerHTML = "";
+        db.read("cd").then((data) => {
             for (let item of data) {
-                document.getElementById("renderTable")!.innerHTML += `
+                document.getElementById("renderCds")!.innerHTML += `
                     <div>
                         <h2>${item.title}</h2>
                         <p><img src="${item.image}" class="w-[150px]"></p>
                         <p>${item.price}</p>
                         <p>${item.stock}</p>
+                        <p>${item.desc}</p>
                     </div>
                 `;
             }
         });
-    }
+        db.read("events").then((data) => {
+            for (let item of data) {
+                document.getElementById("renderCds")!.innerHTML += `
+                    <div>
+                        <h2>${item.title}</h2>
+                        <p><img src="${item.image}" class="w-[150px]"></p>
+                        <p>${item.price}</p>
+                        <p>${item.stock}</p>
+                        <p>${item.desc}</p>
+                    </div>
+                `;
+            }
+        });
+    };
     readData();
     document.getElementById("addCD")?.addEventListener("click", async () => {
         const formImage = document.getElementById("form");
@@ -65,15 +99,19 @@ import background from "../assets/background.svg";
             .getImage(formImage?.querySelector("#image")?.value)
             .then((response) => response.blob())
             .then((blob) => {
-                compresor.zipImage(blob)
-                    .then(async (zipped) => {                    
+                compresor.zipImage(blob).then(async (zipped) => {
                     //aquí irá el código para subir la imagen a un servidor y obtener la url
                     compresor.makeBase64(zipped).then((base64) => {
                         const formValues = {
                             title: formImage?.querySelector("#title")?.value,
-                            price: parseFloat(formImage?.querySelector("#price")?.value),
-                            stock: parseInt(formImage?.querySelector("#stock")?.value),
-                            image: base64
+                            price: parseFloat(
+                                formImage?.querySelector("#price")?.value,
+                            ),
+                            stock: parseInt(
+                                formImage?.querySelector("#stock")?.value,
+                            ),
+                            image: base64,
+                            desc: formImage?.querySelector("#desc")?.value,
                         };
                         //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
                         db.writeAsync("cd", formValues, () => {
@@ -84,7 +122,7 @@ import background from "../assets/background.svg";
                 });
             });
     });
-    socket.on("updatestock", (data) => {
-        db.update("cd", data);
-    });
+    worker.onmessage = (message) => {
+        console.log(message.data);
+    };
 </script>
