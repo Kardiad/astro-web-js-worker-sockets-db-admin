@@ -1,0 +1,37 @@
+<div id="alert" style="display:none;" class="p-4 bg-red-500 text-white rounded w-[80%] m-4 flex items-center justify-between">
+    <div class="flex flex-col">
+        <strong id="alert-type"></strong>
+        <span id="alert-message"></span>
+    </div>
+    <button id="alert-close" class="ml-2 text-white font-bold">
+        X
+    </button>
+</div>
+
+<script>
+    const alertBox = document.getElementById("alert");
+    const alertType = document.getElementById("alert-type");
+    const alertMessage = document.getElementById("alert-message");
+    const closeBtn = document.getElementById("alert-close");
+
+    function showAlert(type : string, message : string) {
+        alertType!.textContent = type + ": ";
+        if (type === "Error") {
+            alertBox!.classList.remove("bg-green-500");
+            alertBox!.classList.add("bg-red-500");
+        } else {
+            alertBox!.classList.remove("bg-red-500");
+            alertBox!.classList.add("bg-green-500");
+        }
+        alertMessage!.textContent = message;
+        alertBox!.style.display = "flex";
+    }
+
+    // Escuchar errores del formulario
+    globalThis.addEventListener("form-error", (event: CustomEvent) => {
+        showAlert(event.detail.type, event.detail.message);
+    });
+    closeBtn!.addEventListener("click", ()=>{
+         alertBox?.style.setProperty("display","none");
+    });
+</script>
