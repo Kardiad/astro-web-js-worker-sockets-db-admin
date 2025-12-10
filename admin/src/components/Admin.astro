@@ -30,10 +30,12 @@ import background from "../assets/background.svg";
 </div>
 
 <script>
+    import { Compresor } from "../db/compresor";
     import { DataBase } from "../db/db";
-    import { io } from "socket.io-client";
+    import { io } from "socket.io-client";    
     const db = new DataBase();
     const socket = io("http://localhost:3000");
+    const compresor = new Compresor();
     socket.on("getdb", (data) => {
         if (data.updatedatabase) {
             db.read().then((result) => {
@@ -41,32 +43,48 @@ import background from "../assets/background.svg";
             });
         }
     });
-    db.read().then((data)=>{
-        for(let item of data){
-            document.getElementById('renderTable')!.innerHTML += `
-                <div>
-                    <h2>${item.title}</h2>
-                    <p>Aquí irá una fotito</p>
-                    <p>${item.price}</p>
-                    <p>${item.stock}</p>
-                </div>
-            `
-        }
-    })
-    document.getElementById("addCD")?.addEventListener("click", () => {
+    const readData = () => {
+        document.getElementById("renderTable")!.innerHTML = "";
+        db.read().then((data) => {
+            for (let item of data) {
+                document.getElementById("renderTable")!.innerHTML += `
+                    <div>
+                        <h2>${item.title}</h2>
+                        <p><img src="${item.image}" class="w-[150px]"></p>
+                        <p>${item.price}</p>
+                        <p>${item.stock}</p>
+                    </div>
+                `;
+            }
+        });
+    }
+    readData();
+    document.getElementById("addCD")?.addEventListener("click", async () => {
         const formImage = document.getElementById("form");
-        const formValues = {
-            title: formImage?.querySelector("#title")?.value,
-            price: parseFloat(formImage?.querySelector("#price")?.value),
-            stock: parseInt(formImage?.querySelector("#stock")?.value),
-            image: formImage?.querySelector("#image")?.value
-        };
-        //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
-        //db.writeAsync("cd", formValues, () => {
-        //    socket.emit("masterupdatedb", formValues);
-        //});
+        compresor
+            .getImage(formImage?.querySelector("#image")?.value)
+            .then((response) => response.blob())
+            .then((blob) => {
+                compresor.zipImage(blob)
+                    .then(async (zipped) => {                    
+                    //aquí irá el código para subir la imagen a un servidor y obtener la url
+                    compresor.makeBase64(zipped).then((base64) => {
+                        const formValues = {
+                            title: formImage?.querySelector("#title")?.value,
+                            price: parseFloat(formImage?.querySelector("#price")?.value),
+                            stock: parseInt(formImage?.querySelector("#stock")?.value),
+                            image: base64
+                        };
+                        //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
+                        db.writeAsync("cd", formValues, () => {
+                            socket.emit("masterupdatedb", formValues);
+                            readData();
+                        });
+                    });
+                });
+            });
     });
     socket.on("updatestock", (data) => {
-        db.update('cd', data)
+        db.update("cd", data);
     });
 </script>
