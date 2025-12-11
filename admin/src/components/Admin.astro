@@ -10,7 +10,7 @@
 <div class="flex flex-col justify-center">
     <!-- Start form to add things -->
     <div class="flex justify-around">
-        <div class="flex flex-col w-[30%] m-auto" id="form">
+        <div class="flex flex-col w-[30%] m-auto" id="formCd">
             <h2>Añadir discos</h2>
             <label for="title">Titulo</label>
             <input type="text" name="title" id="title" placeholder="Título" />
@@ -24,7 +24,7 @@
             <textarea name="desc" id="desc" placeholder="Descripción"></textarea>
             <button id="addCD" class="mt-[1rem]">+</button>
         </div>
-        <div class="flex flex-col w-[30%] m-auto" id="form">
+        <div class="flex flex-col w-[30%] m-auto" id="formEvent">
             <h2>Añadir eventos</h2>
             <label for="title">Titulo</label>
             <input type="text" name="title" id="etitle" placeholder="Título" />
@@ -34,6 +34,18 @@
             <input type="number" name="price" id="eprice" placeholder="0.0" />
             <label for="stock">Aforo</label>
             <input type="number" name="stock" id="estock" placeholder="0" />
+            <div class="w-full flex">
+                <div class="w-[50%]">
+                    <label for="date">Fecha</label>
+                    <input type="date" name="date" id="edate" />
+                </div>
+                <div class="w-[50%] flex flex-col">
+                    <label for="ecordsx">Coordenadas X</label>
+                    <input type="number" name="ecordsx" id="ecordsx" />
+                    <label for="ecordsy">Coordenadas Y</label>
+                    <input type="number" name="ecordsy" id="ecordsy" />
+                </div>
+            </div>
             <label for="desc">Description</label>
             <textarea name="desc" id="edesc" placeholder="Descripción"></textarea>
             <button id="addEvent" class="mt-[1rem]">+</button>
@@ -48,21 +60,12 @@
 <script>
     import { Compresor } from "../db/compresor";
     import { DataBase } from "../db/db";
-    import { io } from "socket.io-client";
     const db = new DataBase();
-    const socket = io("http://localhost:3000");
     const compresor = new Compresor();
     const worker = new Worker("/src/db/WorkerEmiterDB.js", {
         type: "module",
     });
 
-    socket.on("getdb", (data) => {
-        if (data.updatedatabase) {
-            db.read().then((result) => {
-                socket.emit("updatedatabase", result);
-            });
-        }
-    });
     const readData = () => {
         document.getElementById("renderCds")!.innerHTML = "";
         db.read("cd").then((data) => {
@@ -80,7 +83,7 @@
         });
         db.read("events").then((data) => {
             for (let item of data) {
-                document.getElementById("renderCds")!.innerHTML += `
+                document.getElementById("renderEvents")!.innerHTML += `
                     <div>
                         <h2>${item.title}</h2>
                         <p><img src="${item.image}" class="w-[150px]"></p>
@@ -93,8 +96,9 @@
         });
     };
     readData();
+    //Añadir discos
     document.getElementById("addCD")?.addEventListener("click", async () => {
-        const formImage = document.getElementById("form");
+        const formImage = document.getElementById("formCd");
         compresor
             .getImage(formImage?.querySelector("#image")?.value)
             .then((response) => response.blob())
@@ -115,13 +119,62 @@
                         };
                         //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
                         db.writeAsync("cd", formValues, () => {
-                            socket.emit("masterupdatedb", formValues);
+                            worker.postMessage({
+                                action: "masterupdatedb",
+                                data: formValues,
+                            });                            
                             readData();
                         });
                     });
                 });
             });
     });
+    //Fin añadir discos
+    //Añadir eventos
+    document.getElementById("addEvent")?.addEventListener("click", async () => {
+        const formImage = document.getElementById("formEvent");
+        compresor
+            .getImage(formImage?.querySelector("#eimage")?.value)
+            .then((response) => response.blob())
+            .then((blob) => {
+                compresor.zipImage(blob).then(async (zipped) => {
+                    //aquí irá el código para subir la imagen a un servidor y obtener la url
+                    compresor.makeBase64(zipped).then((base64) => {
+                        const formValues = {
+                            title: formImage?.querySelector("#etitle")?.value,
+                            price: parseFloat(
+                                formImage?.querySelector("#eprice")?.value,
+                            ),
+                            stock: parseInt(
+                                formImage?.querySelector("#estock")?.value,
+                            ),
+                            date: formImage?.querySelector("#edate")?.value,
+                            coords: {
+                                x: parseFloat(
+                                    formImage?.querySelector("#ecordsx")
+                                        ?.value,
+                                ),
+                                y: parseFloat(
+                                    formImage?.querySelector("#ecordsy")
+                                        ?.value,
+                                ),
+                            },
+                            image: base64,
+                            desc: formImage?.querySelector("#edesc")?.value,
+                        };
+                        //posteriormente irá en el writeAsync una mierda que permita llevar la info al socket
+                        db.writeAsync("events", formValues, () => {
+                            worker.postMessage({
+                                action: "updateevents",
+                                data: formValues,
+                            });
+                            readData();
+                        });
+                    });
+                });
+            });
+    });
+    //Fin añadir eventos
     worker.onmessage = (message) => {
         console.log(message.data);
     };

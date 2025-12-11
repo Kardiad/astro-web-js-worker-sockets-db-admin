@@ -11,14 +11,20 @@ const io = new Server(http, {
 });
 
 io.on("connection", (socket) => {
-    console.log("cliente conectado");
+    console.log("cliente conectado", socket.id);
     socket.on("masterupdatedb", (data) => {
-        console.log(data);
         io.emit("masterupdatedb", data);
+    });
+    socket.on("masterupdateevents", (data) => {
+        io.emit("masterupdateevents", data);
     });
     socket.on("getdb", (data)=>{
         console.log(data)
         io.emit("getdb", data)
+    })
+    socket.on("getevents", (data)=>{
+        console.log("socket get event",data)
+        io.emit("getevents", data)
     })
     socket.on("updatedatabase", (data)=>{
         console.log(data);
@@ -26,6 +32,12 @@ io.on("connection", (socket) => {
     })
     socket.on("updatestock", (data)=>{
         io.emit("updatestock", data)
+    })
+    socket.on("updateevents", (data)=>{
+        io.emit("updateevents", data)
+    })
+    socket.on("contactform", (data)=>{
+        io.emit("contactform", data)
     })
 });
 
