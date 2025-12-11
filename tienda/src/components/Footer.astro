@@ -109,12 +109,14 @@ const errorMessage = '';
         }
         if (formJson.message.length === 0) {
             errors["message"] = "El mensaje no puede estar vacío";
-        }
-        console.log(errors);
+        }        
         if (Object.keys(errors).length === 0) {
             // enviar el formulario
-            errorMessage = "Formulario enviado correctamente";
-            console.log("Formulario enviado", formJson);
+            errorMessage = "Formulario enviado correctamente";         
+            globalThis.myWorker.postMessage({
+                action: "contactform",
+                data: formJson,
+            });
         } else {
             errorType = "Error";
             errorMessage = Object.values(errors)!.map((err: string) => `${err}`).join(", ");

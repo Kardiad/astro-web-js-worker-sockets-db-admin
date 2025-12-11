@@ -7,8 +7,14 @@ import { DataBase } from "./db";
 //porro y la cosa más inútil que he podido escribir en mi vida, pero como estamos haciendo algo lo más frontend posible, pues eso.
 const db = new DataBase();
 const socket = io('http://localhost:3000');
+globalThis.socket = socket;
+//llama para obtener los cds de la base de datos
 socket.emit('getdb', {
     updatedatabase: true
+})
+//llama para obtener los eventos de la base de datos
+socket.emit('getevents', {
+    updateevents: true
 })
 socket.on("updatedatabase", (data)=>{
     console.log(data);
@@ -16,7 +22,20 @@ socket.on("updatedatabase", (data)=>{
         db.writeAsync('cd', item)
     }
 })
-socket.on("masterupdatedb", (data)=>{
-    console.log(data)
-    db.writeAsync('cd', data)
+socket.on("updateevents", (data)=>{ 
+    console.log(data)   
+    for(let item of data){
+        db.writeAsync('events', item)
+    }
 })
+socket.on("contactform", (data)=>{
+    console.log("contact form data received in loadByAdmin:", data);
+    db.writeAsync('suggestions', data)
+})
+
+//Aquí van los envíos de peticiones al socket para pasarle info al admin
+onmessage = (event) => {
+    if(event.data.action == 'contactform'){
+        socket.emit('contactform', event.data.data)
+    }
+}

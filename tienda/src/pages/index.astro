@@ -16,6 +16,7 @@ import Layout from "../layouts/Layout.astro";
 			type: "module",
 		}
 	);
+	globalThis['myWorker'] = myWorker;
 	myWorker.onmessage = (message) =>{
 		console.log(message.data)
 	}

@@ -2,7 +2,7 @@ export class DataBase {
 
     dbName = "cdProyect";
 
-    dbVersion = 1;
+    dbVersion = 2;
 
     dbConnection;
 
@@ -16,6 +16,12 @@ export class DataBase {
             this.statement = event.target.result;
             if (!this.statement.objectStoreNames?.contains("cd")) {
                 event.target.result.createObjectStore("cd", {
+                    keyPath: "id",
+                    autoIncrement: true
+                })
+            }
+            if (!this.statement.objectStoreNames?.contains("events")) {
+                event.target.result.createObjectStore("events", {
                     keyPath: "id",
                     autoIncrement: true
                 })
@@ -35,8 +41,8 @@ export class DataBase {
             (resolve, reject) => {
                 const dbConnection = globalThis.indexedDB.open(this.dbName, this.dbVersion);
                 dbConnection.onupgradeneeded = (event) => {
-                    if (!event.target.result.objectStoreNames?.contains("cd")) {
-                        event.target.result.createObjectStore("cd", {
+                    if (!event.target.result.objectStoreNames?.contains(table)) {
+                        event.target.result.createObjectStore(table, {
                             keyPath: "id",
                             autoIncrement: true
                         })
@@ -59,8 +65,8 @@ export class DataBase {
                 return new Promise(
                     (resolve, reject) => {
                         let result = [];
-                        const transaction = this.statement.transaction(["cd"], "readonly");
-                        const store = transaction.objectStore("cd");
+                        const transaction = this.statement.transaction([table], "readonly");
+                        const store = transaction.objectStore(table);
                         const request = store.getAll();
                         request.onsuccess = () => {
                             resolve(request.result)
@@ -107,10 +113,9 @@ export class DataBase {
     writeAsync = (table, data) => {
         return this.build()
             .then((db) => {
-                console.log(db.transaction)
                 return new Promise(() => {
-                    const transaction = db.transaction(['cd'], "readwrite");
-                    const store = transaction.objectStore("cd");
+                    const transaction = db.transaction([table], "readwrite");
+                    const store = transaction.objectStore(table);
                     const request = store.add(data);
                     request.onsuccess = () => {
                         console.log(`inserción de ${table} se ha realizado correctamente`)
@@ -124,7 +129,7 @@ export class DataBase {
 
     write = (table, data) => {
         const transaction = this.statement.transaction(['db'], "readwrite");
-        const store = transaction.objectStore("cd");
+        const store = transaction.objectStore(table);
         const request = store.add(data);
         request.onsuccess = () => {
             console.log(`inserción de ${table} se ha realizado correctamente`)
