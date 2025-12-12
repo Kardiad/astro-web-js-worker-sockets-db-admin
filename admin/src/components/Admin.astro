@@ -65,7 +65,7 @@
     const worker = new Worker("/src/db/WorkerEmiterDB.js", {
         type: "module",
     });
-
+    globalThis["worker"] = worker;
     const readData = () => {
         document.getElementById("renderCds")!.innerHTML = "";
         db.read("cd").then((data) => {

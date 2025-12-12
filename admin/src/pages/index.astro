@@ -1,8 +1,24 @@
 ---
 import Admin from '../components/Admin.astro';
+import Nav from '../components/Nav.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-	<Admin />
+	<Nav />
 </Layout>
+<script>
+	// TODO hacer una cookie o algo así que verifique si el worker ya está creado 
+	// o un prevent reload o prevent close que permita cerrar la conexión	
+    import { Compresor } from "../db/compresor";
+    import { DataBase } from "../db/db";
+	let worker: Worker;
+    const db = new DataBase();
+    const compresor = new Compresor();
+	if (!globalThis["worker"]) {
+		worker = new Worker("/src/db/WorkerEmiterDB.js", {
+			type: "module",
+		});
+		globalThis["worker"] = worker;
+	}
+</script>
