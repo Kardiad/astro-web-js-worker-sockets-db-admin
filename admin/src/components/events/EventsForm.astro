@@ -164,7 +164,8 @@
                                 action: "updateevents",
                                 data: formValues,
                             });
-                            readData();
+                            //custom event to notify other components
+                            globalThis.dispatchEvent(new CustomEvent('event-added', { detail: true }));
                         });
                     });
                 });

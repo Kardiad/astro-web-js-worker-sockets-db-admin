@@ -112,8 +112,8 @@ const errorMessage = '';
         }        
         if (Object.keys(errors).length === 0) {
             // enviar el formulario
-            errorMessage = "Formulario enviado correctamente";         
-            globalThis.myWorker.postMessage({
+            errorMessage = "Formulario enviado correctamente";                     
+            globalThis['myWorker'].postMessage({
                 action: "contactform",
                 data: formJson,
             });

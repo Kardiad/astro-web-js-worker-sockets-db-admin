@@ -5,7 +5,7 @@
         <thead
             class="text-sm text-body bg-neutral-secondary-medium border-b border-default-medium"
             id="renderColumnsEvents"
-        >            
+        >
         </thead>
         <tbody id="renderEvents">
             <!-- Data rows will be inserted here by JavaScript -->
@@ -13,5 +13,43 @@
     </table>
 </div>
 <script>
-    
+    const { DataBase } = await import("../../db/db.js");
+    const db = new DataBase();
+    globalThis.addEventListener("event-added", (e) => {
+        console.log("Event added, refreshing data:", e.detail);
+        readData();
+    });
+    const readData = () => {
+        db.read("events").then((data) => {
+            document.getElementById("renderColumnsEvents")!.innerHTML = `
+         <tr>                
+            <th scope="col" class="px-6 py-3"> ID </th>
+            <th scope="col" class="px-6 py-3"> Titulo </th>
+            <th scope="col" class="px-6 py-3"> Precio </th>
+            <th scope="col" class="px-6 py-3"> Stock </th>
+            <th scope="col" class="px-6 py-3"> Acciones </th>
+        </tr>
+        `;
+            document.getElementById("renderEvents")!.innerHTML = "";
+            for (let item of data) {
+                document.getElementById("renderEvents")!.innerHTML += `
+                    <th scope="row" class="px-6 py-4 font-medium text-heading whitespace-nowrap">
+                    ${item.id}
+                </th>
+                <td class="px-6 py-4">
+                    ${item.title}
+                </td>
+                <td class="px-6 py-4">
+                    ${item.price}
+                </td>
+                <td class="px-6 py-4">
+                    ${item.stock}
+                </td>
+                <td class="px-6 py-4">
+                    <a href="#" class="font-medium text-fg-brand hover:underline">Detail</a>
+                </td>`;
+            }
+        });
+    };
+    readData();
 </script>

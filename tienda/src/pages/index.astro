@@ -9,15 +9,3 @@ import Layout from "../layouts/Layout.astro";
 <Layout>
 	<Welcome />
 </Layout>
-<script>
-	const myWorker = new Worker(
-		new URL("../db/loadByAdmin.js", import.meta.url),
-		{
-			type: "module",
-		}
-	);
-	globalThis['myWorker'] = myWorker;
-	myWorker.onmessage = (message) =>{
-		console.log(message.data)
-	}
-</script>

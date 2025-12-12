@@ -1,0 +1,51 @@
+<div
+    class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default"
+>
+    <table class="w-full text-sm text-left rtl:text-right text-body">
+        <thead
+            class="text-sm text-body bg-neutral-secondary-medium border-b border-default-medium"
+            id="renderSugestionsColumns"
+        >
+        </thead>
+        <tbody id="renderSugestions">
+            <!-- Data rows will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+<script>
+    const { DataBase } = await import("../../db/db.js");
+    const db = new DataBase();
+    globalThis.addEventListener("sugestion-added", (e) => {
+        console.log("Sugestion added, refreshing data:", e.detail);
+        readData();
+    });
+    const readData = () => {
+        db.read("suggestions").then((data) => {
+            document.getElementById("renderSugestionsColumns")!.innerHTML = `
+         <tr>                
+            <th scope="col" class="px-6 py-3"> ID </th>
+            <th scope="col" class="px-6 py-3"> Usuario </th>
+            <th scope="col" class="px-6 py-3"> Sugerencia </th>
+            <th scope="col" class="px-6 py-3"> Acciones </th>
+        </tr>
+        `;
+            document.getElementById("renderSugestions")!.innerHTML = "";
+            for (let item of data) {
+                document.getElementById("renderSugestions")!.innerHTML += `
+                    <th scope="row" class="px-6 py-4 font-medium text-heading whitespace-nowrap">
+                    ${item.id}
+                </th>
+                <td class="px-6 py-4">
+                    ${item.email}
+                </td>
+                <td class="px-6 py-4">
+                    ${item.issue}
+                </td>
+                <td class="px-6 py-4">
+                    <a href="#" class="font-medium text-fg-brand hover:underline">Detail</a>
+                </td>`;
+            }
+        });
+    };
+    readData();
+</script>
