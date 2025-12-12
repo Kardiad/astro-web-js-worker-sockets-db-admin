@@ -38,4 +38,9 @@ onmessage = (event) => {
     if(event.data.action == 'contactform'){
         socket.emit('contactform', event.data.data)
     }
+    if(event.data.action == 'getconnecotor'){
+        postMessage({
+            dbconnection: db
+        })
+    }
 }

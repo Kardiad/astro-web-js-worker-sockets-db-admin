@@ -59,7 +59,7 @@ export class DataBase {
             })
     }
 
-    read = () => {
+    read = (table) => {
         return this.build()
             .then((resolve) => {
                 return new Promise(
