@@ -43,4 +43,15 @@ onmessage = (event) => {
             dbconnection: db
         })
     }
+    if(event.data.action == 'sendsale'){
+        for(let item of event.data.data){
+            item.stock -= item.quantity;
+            if(item.coords){
+                db.update('events',item)
+            }else{
+                db.update('cd',item)
+            }
+        }        
+        socket.emit('sale', event.data.data)
+    }
 }

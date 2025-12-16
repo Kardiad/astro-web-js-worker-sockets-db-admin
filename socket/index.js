@@ -39,6 +39,9 @@ io.on("connection", (socket) => {
     socket.on("contactform", (data)=>{
         io.emit("contactform", data)
     })
+    socket.on("sale", (data)=>{
+        io.emit("sale", data)
+    })
 });
 
 

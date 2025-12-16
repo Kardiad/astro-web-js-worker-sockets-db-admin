@@ -52,7 +52,7 @@
       </div>
     </div>
   </div>
-  <ShopingCart :products="selectedProducts"/>
+  <ShopingCart :products="selectedProducts" @sendsale="handleSale()"/>
 </template>
 
 <script setup>
@@ -64,12 +64,19 @@ let products = ref([]);
 let selectedProducts = ref([]);
 
 onMounted(async () => {
-  db = new DataBase();
-  products.value = await db.read("cd");
-  for (let event of await db.read("events")) {
-    products.value.push(event);
+  const refresh = async () => {
+    db = new DataBase();
+    products.value = await db.read("cd");
+    for (let event of await db.read("events")) {
+      products.value.push(event);
+    }
   }
+  refresh();
 });
+const handleSale = (data) => {
+  let selectedProducts = ref([])
+  refresh();
+}
 const clicked = (p) => {
   if (p.stock > 0) { 
     selectedProducts.value.push(p)

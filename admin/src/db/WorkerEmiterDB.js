@@ -19,22 +19,33 @@ socket.on("getdb", (data) => {
 socket.on("getevents", (data) => {
     if (data.updateevents) {
         db.read("events").then((events) => {
-            console.log('leyendo eventos:', events)
             socket.emit("updateevents", events)
         })
     }
 })
 
-socket.on("contactform", (data)=>{
-    console.log("contact form data received in loadByAdmin:", data);
-    db.writeAsync('suggestions', data, ()=>{})
+socket.on("contactform", (data) => {
+    db.writeAsync('suggestions', data, () => { })
 })
 
-onmessage = (event) => {   
-    if(event.data.action == 'masterupdatedb'){
+socket.on("sale", (data) => {
+    for (let item of data) {
+        if (item.coords) {
+            db.update('events', item)
+        } else {
+            db.update('cd', item)
+        }
+    }
+    socket.emit('getdb', {
+        updatedatabase : true
+    })
+})
+
+onmessage = (event) => {
+    if (event.data.action == 'masterupdatedb') {
         socket.emit("masterupdatedb", event.data.data);
     }
-    if(event.data.action == 'updateevents'){
+    if (event.data.action == 'updateevents') {
         socket.emit("updateevents", event.data.data);
     }
 }

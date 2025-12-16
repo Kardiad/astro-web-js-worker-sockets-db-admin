@@ -2,7 +2,7 @@ export class DataBase {
 
     dbName = "cdProyect";
 
-    dbVersion = 2;
+    dbVersion = 3;
 
     dbConnection;
 
@@ -12,7 +12,6 @@ export class DataBase {
     constructor() {
         this.dbConnection = globalThis.indexedDB.open(this.dbName, this.dbVersion);
         this.dbConnection.onupgradeneeded = (event) => {
-            console.log("Creando db... cdProyect")
             this.statement = event.target.result;
             if (!this.statement.objectStoreNames?.contains("cd")) {
                 event.target.result.createObjectStore("cd", {
@@ -32,6 +31,13 @@ export class DataBase {
                     autoIncrement: true
                 })
             }
+            if (!this.statement.objectStoreNames?.contains("sales")) {
+                event.target.result.createObjectStore("sales", {
+                    keyPath: "id",
+                    autoIncrement: true
+                })
+            }
+            
         }
         this.dbConnection.onsuccess = (event) => {
             this.statement = event.target.result;
@@ -69,7 +75,6 @@ export class DataBase {
                 dbConnection.onsuccess = (event) => {
                     resolve(event.target.result);
                     this.statement = event.target.result
-                    console.log("Conexión abierta", event.target.result);
                 }
                 dbConnection.onerror = (event) => {
                     console.log("Error de conexión", event.target.result)
@@ -131,7 +136,6 @@ export class DataBase {
     writeAsync = (table, data, callback) => {
         return this.build()
             .then((db) => {
-                console.log(db.transaction)
                 return new Promise(() => {
                     const transaction = db.transaction([table], "readwrite");
                     const store = transaction.objectStore(table);

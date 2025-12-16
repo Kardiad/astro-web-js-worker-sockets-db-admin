@@ -2,7 +2,7 @@ export class DataBase {
 
     dbName = "cdProyect";
 
-    dbVersion = 2;
+    dbVersion = 3;
 
     dbConnection;
 
@@ -22,6 +22,12 @@ export class DataBase {
             }
             if (!this.statement.objectStoreNames?.contains("events")) {
                 event.target.result.createObjectStore("events", {
+                    keyPath: "id",
+                    autoIncrement: true
+                })
+            }
+            if (!this.statement.objectStoreNames?.contains("sales")) {
+                event.target.result.createObjectStore("sales", {
                     keyPath: "id",
                     autoIncrement: true
                 })
