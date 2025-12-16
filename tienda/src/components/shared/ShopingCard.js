@@ -1,4 +1,5 @@
 export class ShopingCard {
+    mutationObserver = null;
     shopComponent = `
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {{CARDS}}
@@ -54,6 +55,10 @@ export class ShopingCard {
             <span class="text-2xl font-extrabold text-heading">{{PRICE}}</span>
         </div>
     </div>`;
+
+    constructor(){
+        //aquí habrá que crear el mutation observer que va a orquestar ambos compoenentes que conviven aquí
+    }
 
     init() {
         
