@@ -52,7 +52,7 @@
       </div>
     </div>
   </div>
-  <ShopingCart :products="selectedProducts" @sendsale="handleSale()"/>
+  <ShopingCart :products="selectedProducts" @sendsale="handleSale"/>
 </template>
 
 <script setup>
@@ -73,8 +73,9 @@ onMounted(async () => {
   }
   refresh();
 });
-const handleSale = (data) => {
-  let selectedProducts = ref([])
+const handleSale = (sales) => {
+  console.log('Venta recibida:', sales)
+  selectedProducts.value = []
   refresh();
 }
 const clicked = (p) => {

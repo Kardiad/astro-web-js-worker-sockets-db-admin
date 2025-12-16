@@ -88,6 +88,7 @@
             type="button"
             class="text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
             @click="sendSale()"
+            :disabled="products.length == 0"
           >
             Comprar
           </button>
@@ -104,31 +105,35 @@
   </div>
 </template>
 <script setup>
-import {toRaw} from 'vue';
+import { toRaw } from 'vue';
+
 const props = defineProps({
   products: {
     type: Array,
     required: true,
   },
 });
+
 const emit = defineEmits(['sendsale'])
 
-const sendsale = () => {
-  emit('sendsale', {reload:true})
-}
 const getTotal = () => {
-    let total = 0;
-    for(let line of props.products){
-        total += line.price * line.quantity;
-    }
-    return total
+  let total = 0;
+  for (let line of props.products) {
+    total += line.price * line.quantity;
+  }
+  return total
 }
+
 const sendSale = () => {
   const sales = toRaw(props.products);
-  props.products = []
+
+  // 👉 emitir evento al padre
+  emit('sendsale', sales)
+
+  // (opcional) seguir usando el worker si lo necesitas
   globalThis.myWorker.postMessage({
-    action : 'sendsale',
-    data : sales
+    action: 'sendsale',
+    data: sales
   })
 }
 </script>

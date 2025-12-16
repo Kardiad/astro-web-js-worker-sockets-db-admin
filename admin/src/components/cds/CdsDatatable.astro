@@ -52,9 +52,6 @@
     readData();
     globalThis.addEventListener('cd-added', (event) => {
         if(event.detail){
-            globalThis.worker.postMessage({
-
-            })
             readData();
         }
     });
