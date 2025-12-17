@@ -28,13 +28,24 @@ socket.on("contactform", (data) => {
     db.writeAsync('suggestions', data, () => { })
 })
 
-socket.on("sale", (data) => {
+socket.on("saledata", (data) => {
+    console.log(data)
     for (let item of data) {
+        console.log(item)
+        const updateable = item;
+        db.writeAsync('sales', {
+            title : item.title,
+            date : item.date,
+            stock : item.stock,
+            quantity : item.stock,
+            price : item.price
+        } , ()=>{})
         if (item.coords) {
-            db.update('events', item)
+            db.update('events', updateable)
         } else {
-            db.update('cd', item)
+            db.update('cd', updateable)
         }
+        
     }
     socket.emit('getdb', {
         updatedatabase : true

@@ -62,9 +62,9 @@ import ShopingCart from './ShopingCart.vue'
 let db;
 let products = ref([]);
 let selectedProducts = ref([]);
-
+let refresh;
 onMounted(async () => {
-  const refresh = async () => {
+  refresh = async () => {
     db = new DataBase();
     products.value = await db.read("cd");
     for (let event of await db.read("events")) {

@@ -46,6 +46,7 @@ onmessage = (event) => {
     if(event.data.action == 'sendsale'){
         for(let item of event.data.data){
             item.stock -= item.quantity;
+            item.date = (new Date).toISOString().slice(0, 19);
             if(item.coords){
                 db.update('events',item)
             }else{

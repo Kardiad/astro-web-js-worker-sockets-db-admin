@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
         io.emit("contactform", data)
     })
     socket.on("sale", (data)=>{
-        io.emit("sale", data)
+        io.emit("saledata", data)
     })
 });
 

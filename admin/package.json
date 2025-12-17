@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "apexcharts": "^3.46.0",
     "astro": "^5.16.4",
+    "chart.js": "^4.5.1",
     "flowbite": "^4.0.1",
     "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.1.17"

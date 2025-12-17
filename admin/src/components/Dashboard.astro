@@ -1,0 +1,128 @@
+<div class="flex flex-col sm:flex-row justify-around mt-[7rem]">
+    <div class="w-[400px]">
+        <h2 class="text-center">Cantidad de € generados</h2>
+        <canvas id="sales"></canvas>
+    </div>
+    <div class="w-[400px]">
+        <h2 class="text-center">Número de ventas</h2>
+        <canvas id="money"></canvas>
+    </div>
+</div>
+<script>
+    import { Chart, registerables } from "chart.js";
+    import { DataBase } from "../db/db";
+    Chart.register(...registerables);
+    const ctx = document.getElementById("sales").getContext("2d");
+    const ctx2 = document.getElementById("money").getContext("2d");
+    const db = new DataBase();
+    const getSalesByMonth = (month, data) => {
+        return data.filter((element)=>new Date(element.date).getMonth() == month).length
+    }
+    const getPriceByMonth = (month, data) => {
+        let prices = 0;
+        for(let item of data.filter((element)=>new Date(element.date).getMonth() == month)){
+            if(!isNaN(item.price)){
+                prices += parseFloat(item.price);
+            }
+        }
+        return prices;
+    }
+    db.read("sales").then((data) => {
+        const miGrafico = new Chart(ctx, {
+            type: "bar", // tipo de gráfico
+            data: {
+                labels: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+                datasets: [
+                    {
+                        label: "Ventas",
+                        data: [
+                            getPriceByMonth(0, data),
+                            getPriceByMonth(1, data),
+                            getPriceByMonth(2, data),
+                            getPriceByMonth(3, data),
+                            getPriceByMonth(4, data),
+                            getPriceByMonth(5, data),
+                            getPriceByMonth(6, data),
+                            getPriceByMonth(7, data),
+                            getPriceByMonth(8, data),
+                            getPriceByMonth(9, data),
+                            getPriceByMonth(10, data),
+                            getPriceByMonth(11, data)
+                        ],
+                        backgroundColor: "rgba(54, 162, 235, 0.5)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+        const grafico2 = new Chart(ctx2,  {
+            type: "bar", // tipo de gráfico
+            data: {
+                labels: [
+                    "Enero",
+                    "Febrero",
+                    "Marzo",
+                    "Abril",
+                    "Mayo",
+                    "Junio",
+                    "Julio",
+                    "Agosto",
+                    "Septiembre",
+                    "Octubre",
+                    "Noviembre",
+                    "Diciembre",
+                ],
+                datasets: [
+                    {
+                        label: "Ventas",
+                        data: [
+                            getSalesByMonth(0, data),
+                            getSalesByMonth(1, data),
+                            getSalesByMonth(2, data),
+                            getSalesByMonth(3, data),
+                            getSalesByMonth(4, data),
+                            getSalesByMonth(5, data),
+                            getSalesByMonth(6, data),
+                            getSalesByMonth(7, data),
+                            getSalesByMonth(8, data),
+                            getSalesByMonth(9, data),
+                            getSalesByMonth(10, data),
+                            getSalesByMonth(11, data)
+                        ],
+                        backgroundColor: "rgba(54, 162, 235, 0.5)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        })
+    });
+</script>
