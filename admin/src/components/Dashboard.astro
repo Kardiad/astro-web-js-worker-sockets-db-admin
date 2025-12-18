@@ -29,7 +29,7 @@
     }
     db.read("sales").then((data) => {
         const miGrafico = new Chart(ctx, {
-            type: "bar", // tipo de gráfico
+            type: "line", // tipo de gráfico
             data: {
                 labels: [
                     "Enero",
@@ -47,7 +47,7 @@
                 ],
                 datasets: [
                     {
-                        label: "Ventas",
+                        label: "€",
                         data: [
                             getPriceByMonth(0, data),
                             getPriceByMonth(1, data),
@@ -77,7 +77,7 @@
             },
         });
         const grafico2 = new Chart(ctx2,  {
-            type: "bar", // tipo de gráfico
+            type: "line", // tipo de gráfico
             data: {
                 labels: [
                     "Enero",
