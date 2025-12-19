@@ -17,6 +17,7 @@
     "astro": "^5.16.4",
     "flowbite": "^4.0.1",
     "gsap": "^3.14.1",
+    "leaflet": "^1.9.4",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "socket.io-client": "^4.8.1",
