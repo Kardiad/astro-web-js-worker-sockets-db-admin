@@ -1,46 +1,29 @@
-# Astro Starter Kit: Basics
+# Shopycd
+## Descripción
+Este proyecto es una idea de tienda de música con conciertos y tickets de éstos. La cosa y el reto real
+de este proyecto es una suerte de experimentación entre sockets, de modo que la ventana maestra está 
+mandando los datos en tiempo real (pero no siempre los carga en tiempo real, hay que refrescar). Respecto
+a la idea del proyecto se presenta la siguiente arquitectura
 
-```sh
-npm create astro@latest -- --template basics
+![alt text](image.png)
+
+## Requisitos
+Node la última versión a día 19/12/2025 (v22.14.0) puesto que se hizo con esto
+npm (11.6.3)
+Tener un navegador (el que más rabia te de)
+
+
+## Instalación
+Simple en cada carpeta que presenta el repositorio hay que tirar el siguiente comando
+npm i
+Para ejecutarlo abre 3 consolas (1 por carpeta) y lanza el siguiente comando situado en 
+dicha carpeta: 
+```bash
+    npm run dev
 ```
+Y ya lo tienes listo para jugar
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Estructura de carpetas
+tienda : ahí está el proyecto de la tienda
+admin : ahí está el admin
+socket: ahí está el socket.
